@@ -94,7 +94,7 @@ function App() {
             Key: selectedFile.name,
             Body: selectedFile,
         };
-
+        console.log(fileParams);
 
         try {
             await s3Client.send(new PutObjectCommand(fileParams));
