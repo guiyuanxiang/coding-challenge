@@ -18,7 +18,7 @@ const upload_fail = '上传失败';
 const toast = '请输入文本和选择文件';
 const bucket = 'codechallengeganbdadei';
 const region = 'us-east-1';
-const functionName = 'myfunction';
+const functionName = 'myFunction';
 
 const s3Client = new S3Client({
     region: region,
