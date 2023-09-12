@@ -11,7 +11,6 @@ table_name = args[2]
 aws_access_key_id = args[3]
 aws_secret_access_key = args[4]
 
-
 region = 'us-east-1'
 
 dynamodb = boto3.client('dynamodb', region_name=region)  # 替换为您的区域
@@ -25,8 +24,8 @@ response = dynamodb.get_item(
 )
 print(response['Item'])
 # 从 DynamoDB 响应中提取 inputText
-input_text = response['Item']['input']['S'] if 'Item' in response else ''
-filePath = response['Item']['filename']['S'] if 'Item' in response else ''
+input_text = response['Item']['input_text']['S'] if 'Item' in response else ''
+filePath = response['Item']['input_file_path']['S'] if 'Item' in response else ''
 
 # 步骤 2：从 S3 下载文件
 
@@ -48,14 +47,14 @@ output_file_key = 'out' + fine_name  # 替换为要上传的文件键
 s3.upload_file(downloaded_file_path, bucket_name, output_file_key)
 
 print(f'文件已上传至 S3 存储桶：s3://{bucket_name}/{output_file_key}')
-output_file_path = bucket_name/output_file_key
-update_expression = 'SET output_file_path = :new_value'
-expression_attribute_values = {':new_value': {'S': 'output_file_path'}}
+# 步骤 5： 将上传后的路径作为 output_file_path字段，更新 DynamoDB 表 的这条数据
+output_file_path = bucket_name + '/' + output_file_key
+
 response = dynamodb.update_item(
     TableName=table_name,
-    Key={'id': {'S': item_id}},  # 主键的名称和值
-    UpdateExpression=update_expression,
-    ExpressionAttributeValues=expression_attribute_values
+    Key={'id': {'S': item_id}},
+    UpdateExpression='SET output_file_path = :path',
+    ExpressionAttributeValues={':path': {'S': output_file_path}}
 )
 
 # 打印响应
