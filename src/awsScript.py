@@ -3,7 +3,7 @@ import boto3
 
 # 获取命令行参数，sys.argv[0] 是脚本名称，sys.argv[1:] 包含所有其他参数
 args = sys.argv[1:]
-
+print(args)
 bucketName = args[0]
 print(bucketName)
 id = args[1]
@@ -48,3 +48,15 @@ output_file_key = 'out' + fine_name  # 替换为要上传的文件键
 s3.upload_file(downloaded_file_path, bucket_name, output_file_key)
 
 print(f'文件已上传至 S3 存储桶：s3://{bucket_name}/{output_file_key}')
+output_file_path = bucket_name/output_file_key
+update_expression = 'SET output_file_path = :new_value'
+expression_attribute_values = {':new_value': {'S': 'output_file_path'}}
+response = dynamodb.update_item(
+    TableName=table_name,
+    Key={'id': {'S': item_id}},  # 主键的名称和值
+    UpdateExpression=update_expression,
+    ExpressionAttributeValues=expression_attribute_values
+)
+
+# 打印响应
+print("UpdateItem succeeded:", response)

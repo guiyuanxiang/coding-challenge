@@ -40,8 +40,8 @@ const uploadFile = async (input, filename) => {
     try {
         const filePath = bucket.concat('/').concat(filename);
         const body = {
-            filename: filePath,
-            input: input,
+            input_file_path: filePath,
+            input_text: input,
             // 添加其他字段和数据...
         };
 
